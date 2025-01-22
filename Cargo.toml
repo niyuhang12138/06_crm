@@ -18,3 +18,9 @@ sqlx = { version = "0.8.3", features = [
 ] }
 serde = { version = "1.0.217", features = ["derive"] }
 chrono = { version = "0.4.39", features = ["serde"] }
+rand = "0.8.5"
+derive_builder = "0.20.2"
+tokio-stream = "0.1.17"
+serde_yaml = "0.9.34"
+tracing = "0.1.41"
+tracing-subscriber = { version = "0.3.19", features = ["env-filter"] }

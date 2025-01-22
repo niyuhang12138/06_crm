@@ -13,12 +13,19 @@ tokio = { workspace = true }
 tonic = { workspace = true }
 serde = { workspace = true }
 chrono = { workspace = true }
-rand = "0.8.5"
-
+rand = { workspace = true }
+derive_builder = { workspace = true }
+tokio-stream = { workspace = true }
+serde_yaml = { workspace = true }
+futures = "0.3.31"
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
+itertools = "0.14.0"
 
 [build-dependencies]
 anyhow = { workspace = true }
 prost-build = { workspace = true }
+proto-builder-trait = "0.6.2"
 tonic-build = { workspace = true }
 
 [dev-dependencies]

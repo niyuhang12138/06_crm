@@ -1,3 +1,8 @@
+use std::{
+    collections::HashSet,
+    hash::{Hash, Hasher},
+};
+
 use anyhow::Result;
 use chrono::{DateTime, Days, Utc};
 use fake::{
@@ -8,7 +13,6 @@ use nanoid::nanoid;
 use rand::Rng;
 use serde::{Deserialize, Serialize};
 use sqlx::{Executor, PgPool};
-use std::{collections::HashSet, hash::Hash};
 use tokio::time::Instant;
 
 // generate 10000 users and run them in a tx, repeat 500 times
@@ -52,25 +56,20 @@ struct UserStat {
 async fn main() -> Result<()> {
     let pool = PgPool::connect("postgres://postgres:nyh196511@localhost:5432/stats").await?;
     for i in 1..=500 {
-        let users = (0..10000)
-            .map(|_| Faker.fake::<UserStat>())
-            .collect::<HashSet<_>>();
+        let users: HashSet<_> = (0..10000).map(|_| Faker.fake::<UserStat>()).collect();
 
         let start = Instant::now();
-        println!("Inserting batch {}...", i);
-        bulk_insert(users, &pool).await?;
-        println!("done");
+        raw_insert(users, &pool).await?;
         println!("Batch {} inserted in {:?}", i, start.elapsed());
     }
-
     Ok(())
 }
 
-#[allow(dead_code)]
 async fn raw_insert(users: HashSet<UserStat>, pool: &PgPool) -> Result<()> {
     let mut sql = String::with_capacity(10 * 1000 * 1000);
-    sql.push_str("INSERT INTO user_stats(email, name, created_at, last_visited_at, last_watched_at, recent_watched, viewed_but_not_started, started_but_not_finished, finished, last_email_notification, last_in_app_notification, last_sms_notification) VALUES ");
-
+    sql.push_str("
+    INSERT INTO user_stats(email, name, created_at, last_visited_at, last_watched_at, recent_watched, viewed_but_not_started, started_but_not_finished, finished, last_email_notification, last_in_app_notification, last_sms_notification)
+    VALUES");
     for user in users {
         sql.push_str(&format!(
             "('{}', '{}', '{}', '{}', '{}', {}::int[], {}::int[], {}::int[], {}::int[], '{}', '{}', '{}'),",
@@ -85,49 +84,46 @@ async fn raw_insert(users: HashSet<UserStat>, pool: &PgPool) -> Result<()> {
             list_to_string(user.finished),
             user.last_email_notification,
             user.last_in_app_notification,
-            user.last_sms_notification
+            user.last_sms_notification,
         ));
     }
 
-    sql.pop();
-    sql.push(';');
-    sqlx::query(&sql).execute(pool).await?;
+    let v = &sql[..sql.len() - 1];
+    sqlx::query(v).execute(pool).await?;
 
     Ok(())
 }
 
-#[allow(dead_code)]
 fn list_to_string(list: Vec<i32>) -> String {
-    format!("ARRAY{list:?}")
+    format!("ARRAY{:?}", list)
 }
 
+#[allow(dead_code)]
 async fn bulk_insert(users: HashSet<UserStat>, pool: &PgPool) -> Result<()> {
     let mut tx = pool.begin().await?;
     for user in users {
         let query = sqlx::query(
-            r#"
-          INSERT INTO user_stats(email, name, created_at, last_visited_at, last_watched_at, recent_watched, viewed_but_not_started, started_but_not_finished, finished, last_email_notification, last_in_app_notification, last_sms_notification)
-          VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
-          "#,
+           r#"
+            INSERT INTO user_stats(email, name, created_at, last_visited_at, last_watched_at, recent_watched, viewed_but_not_started, started_but_not_finished, finished, last_email_notification, last_in_app_notification, last_sms_notification)
+            VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+           "#
         )
-        .bind(user.email)
-        .bind(user.name)
+        .bind(&user.email)
+        .bind(&user.name)
         .bind(user.created_at)
         .bind(user.last_visited_at)
         .bind(user.last_watched_at)
-        .bind(user.recent_watched)
-        .bind(user.viewed_but_not_started)
-        .bind(user.started_but_not_finished)
-        .bind(user.finished)
+        .bind(&user.recent_watched)
+        .bind(&user.viewed_but_not_started)
+        .bind(&user.started_but_not_finished)
+        .bind(&user.finished)
         .bind(user.last_email_notification)
         .bind(user.last_in_app_notification)
-        .bind(user.last_sms_notification);
-
+        .bind(user.last_sms_notification)
+        ;
         tx.execute(query).await?;
     }
-
     tx.commit().await?;
-
     Ok(())
 }
 
@@ -140,7 +136,7 @@ fn now() -> DateTime<Utc> {
 }
 
 impl Hash for UserStat {
-    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+    fn hash<H: Hasher>(&self, state: &mut H) {
         self.email.hash(state);
     }
 }
