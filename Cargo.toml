@@ -1,5 +1,5 @@
 [workspace]
-members = ["crm", "user-stat"]
+members = ["crm", "crm-metadata", "crm-send", "user-stat"]
 resolver = "2"
 
 [workspace.dependencies]
@@ -24,3 +24,7 @@ tokio-stream = "0.1.17"
 serde_yaml = "0.9.34"
 tracing = "0.1.41"
 tracing-subscriber = { version = "0.3.19", features = ["env-filter"] }
+futures = "0.3.31"
+itertools = "0.14.0"
+fake = { version = "3.1.0", features = ["derive", "chrono"] }
+nanoid = "0.4.0"
