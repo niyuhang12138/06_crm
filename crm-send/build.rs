@@ -1,5 +1,4 @@
 use anyhow::Result;
-// use proto_builder_trait::tonic::BuilderAttributes;
 use std::fs;
 
 fn main() -> Result<()> {
@@ -10,8 +9,8 @@ fn main() -> Result<()> {
         .out_dir("src/pb")
         .compile_protos(
             &[
-                "../protos/metadata/messages.proto",
-                "../protos/metadata/rpc.proto",
+                "../protos/notification/messages.proto",
+                "../protos/notification/rpc.proto",
             ],
             &["../protos"],
         )

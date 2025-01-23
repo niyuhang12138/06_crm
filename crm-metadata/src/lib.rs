@@ -37,7 +37,7 @@ impl MetadataService {
         Self { config }
     }
 
-    pub fn into_server(self) -> MetadataServer<Self> {
+    pub fn into_server(self) -> MetadataServer<MetadataService> {
         MetadataServer::new(self)
     }
 }
