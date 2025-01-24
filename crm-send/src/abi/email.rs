@@ -3,8 +3,10 @@ use crate::{
     pb::{send_request::Msg, EmailMessage, SendRequest, SendResponse},
     NotificationService,
 };
+use fake::{faker::internet::zh_cn::SafeEmail, Fake};
 use tonic::Status;
 use tracing::warn;
+use uuid::Uuid;
 
 impl Sender for EmailMessage {
     async fn send(self, scv: NotificationService) -> Result<SendResponse, Status> {
@@ -30,12 +32,7 @@ impl From<EmailMessage> for SendRequest {
     }
 }
 
-#[cfg(test)]
-use fake::{faker::internet::zh_cn::SafeEmail, Fake};
-#[allow(unused)]
-use uuid::Uuid;
-
-#[cfg(test)]
+#[cfg(feature = "test-util")]
 impl EmailMessage {
     pub fn fake() -> Self {
         Self {

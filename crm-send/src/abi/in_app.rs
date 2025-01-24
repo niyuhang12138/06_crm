@@ -31,6 +31,7 @@ impl From<InAppMessage> for SendRequest {
     }
 }
 
+#[cfg(feature = "test-util")]
 impl InAppMessage {
     pub fn fake() -> Self {
         Self {

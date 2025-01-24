@@ -4,6 +4,10 @@ version = "0.1.0"
 edition = "2021"
 license = "MIT"
 
+[features]
+default = []
+test-util = []
+
 [dependencies]
 sqlx = { workspace = true }
 anyhow = { workspace = true }
@@ -22,6 +26,8 @@ tracing = { workspace = true }
 tracing-subscriber = { workspace = true }
 itertools = { workspace = true }
 uuid = { version = "1.12.1", features = ["v4"] }
+nanoid = { workspace = true }
+fake = { workspace = true }
 
 [build-dependencies]
 anyhow = { workspace = true }
@@ -30,5 +36,4 @@ proto-builder-trait = "0.6.2"
 tonic-build = { workspace = true }
 
 [dev-dependencies]
-fake = { workspace = true }
-nanoid = { workspace = true }
+crm-send = { workspace = true, features = ["test-util"] }
