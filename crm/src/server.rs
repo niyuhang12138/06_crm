@@ -17,7 +17,7 @@ async fn main() -> Result<()> {
 
     let addr = format!("[::1]:{}", config.server.port).parse().unwrap();
     info!("Crm service listening on {}", addr);
-    let svc = CrmService::try_new(config).await?.into_server();
+    let svc = CrmService::try_new(config).await?.into_server()?;
 
     if let Some(tls) = tls {
         let identify = Identity::from_pem(tls.cert, tls.key);

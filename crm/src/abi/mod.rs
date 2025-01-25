@@ -1,19 +1,20 @@
-use std::sync::Arc;
-
-use chrono::{Duration, Utc};
-use crm_metadata::pb::MaterializeRequest;
-use crm_send::pb::SendRequest;
-use futures::StreamExt;
-use tokio::sync::mpsc;
-use tokio_stream::wrappers::ReceiverStream;
-use tonic::{Response, Status};
-use tracing::warn;
-use user_stat::QueryRequest;
+mod auth;
 
 use crate::{
     pb::{WelcomeRequest, WelcomeResponse},
     CrmService,
 };
+pub use auth::{DecodingKey, User};
+use chrono::{Duration, Utc};
+use crm_metadata::pb::MaterializeRequest;
+use crm_send::pb::SendRequest;
+use futures::StreamExt;
+use std::sync::Arc;
+use tokio::sync::mpsc;
+use tokio_stream::wrappers::ReceiverStream;
+use tonic::{Response, Status};
+use tracing::warn;
+use user_stat::QueryRequest;
 
 impl CrmService {
     pub async fn welcome(&self, req: WelcomeRequest) -> Result<Response<WelcomeResponse>, Status> {
@@ -50,7 +51,7 @@ impl CrmService {
                 let tx = tx.clone();
 
                 let req = SendRequest::new(
-                    "Welusercome".to_string(),
+                    "Welcome".to_string(),
                     sender_clone,
                     &[user.email],
                     &contents_clone,

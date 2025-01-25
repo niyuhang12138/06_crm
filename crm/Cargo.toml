@@ -35,6 +35,9 @@ user-stat = { workspace = true }
 crm-metadata = { workspace = true }
 crm-send = { workspace = true }
 uuid = { workspace = true }
+jwt-simple = { version = "0.12.11", default-features = false, features = [
+  "pure-rust",
+] }
 
 
 [build-dependencies]
