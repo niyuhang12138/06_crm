@@ -32,3 +32,5 @@ crm = { path = "crm" }
 user-stat = { path = "user-stat" }
 crm-send = { path = "crm-send" }
 crm-metadata = { path = "crm-metadata" }
+proto-builder-trait = "0.6.2"
+uuid = { version = "1.12.1", features = ["v4"] }

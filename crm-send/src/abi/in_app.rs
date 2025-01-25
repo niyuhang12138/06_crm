@@ -5,7 +5,6 @@ use crate::{
 };
 use tonic::Status;
 use tracing::warn;
-use uuid::Uuid;
 
 impl Sender for InAppMessage {
     async fn send(self, scv: NotificationService) -> Result<SendResponse, Status> {
@@ -34,6 +33,7 @@ impl From<InAppMessage> for SendRequest {
 #[cfg(feature = "test-util")]
 impl InAppMessage {
     pub fn fake() -> Self {
+        use uuid::Uuid;
         Self {
             message_id: Uuid::new_v4().to_string(),
             derive_id: Uuid::new_v4().to_string(),

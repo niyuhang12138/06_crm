@@ -10,7 +10,7 @@ async fn main() -> Result<()> {
     tracing_subscriber::registry().with(layer).init();
     let config = AppConfig::load().expect("Failed to load config");
     let addr = format!("[::1]:{}", config.server.port).parse().unwrap();
-    info!("GreeterServer listening on {}", addr);
+    info!("User stat listening on {}", addr);
     let svc = UserStatsService::new(config).await.into_server();
 
     Server::builder().add_service(svc).serve(addr).await?;
