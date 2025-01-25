@@ -1,17 +1,25 @@
 use anyhow::Result;
-use crm::{
-    pb::{crm_client::CrmClient, WelcomeRequestBuilder},
-    AppConfig,
+use crm::pb::{crm_client::CrmClient, WelcomeRequestBuilder};
+use tonic::{
+    transport::{Certificate, Channel, ClientTlsConfig},
+    Request,
 };
-use tonic::Request;
 use uuid::Uuid;
 
 #[tokio::main]
 async fn main() -> Result<()> {
-    let config = AppConfig::load().expect("Failed to load config");
-    let addr = format!("http://[::1]:{}", config.server.port);
+    let pem = include_str!("../../fixtures/rootCA.pem");
+    let ca = Certificate::from_pem(pem);
 
-    let mut client = CrmClient::connect(addr).await?;
+    let tls = ClientTlsConfig::new()
+        .ca_certificate(ca)
+        .domain_name("localhost");
+    let channel = Channel::from_static("https://[::1]:50000")
+        .tls_config(tls)?
+        .connect()
+        .await?;
+
+    let mut client = CrmClient::new(channel);
 
     let req = WelcomeRequestBuilder::default()
         .id(Uuid::new_v4().to_string())
